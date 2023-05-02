@@ -15,11 +15,8 @@ namespace Entitas.CodeGeneration.Plugins
     public ${ComponentType} ${validComponentName} { get { return (${ComponentType})GetComponent(${Index}); } }
     public bool has${ComponentName} { get { return HasComponent(${Index}); } }
 
-    public ${EntityType} With{ComponentName}(${newMethodParameters}) {
-        var index = ${Index};
-        var component = (${ComponentType})CreateComponent(index, typeof(${ComponentType}));
-${memberAssignmentList}
-        AddComponent(index, component);
+    public ${EntityType} With${ComponentName}(${newMethodParameters}) {
+        Add${ComponentName}(${newMethodArgs});
         return this;
     }
 
@@ -50,14 +47,17 @@ ${memberAssignmentList}
 
     public ${EntityType} Set${ComponentName}(bool value) {
         ${prefixedComponentName} = value;
+        return this;
     }
 
     public ${EntityType} SetIs${ComponentName}() {
         ${prefixedComponentName} = true;
+        return this;
     }
 
     public ${EntityType} SetIsNot${ComponentName}() {
         ${prefixedComponentName} = false;
+        return this;
     }
 
     public bool ${prefixedComponentName} {
