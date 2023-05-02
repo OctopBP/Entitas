@@ -15,6 +15,14 @@ namespace Entitas.CodeGeneration.Plugins
     public ${ComponentType} ${validComponentName} { get { return (${ComponentType})GetComponent(${Index}); } }
     public bool has${ComponentName} { get { return HasComponent(${Index}); } }
 
+    public ${EntityType} With{ComponentName}(${newMethodParameters}) {
+        var index = ${Index};
+        var component = (${ComponentType})CreateComponent(index, typeof(${ComponentType}));
+${memberAssignmentList}
+        AddComponent(index, component);
+        return this;
+    }
+
     public void Add${ComponentName}(${newMethodParameters}) {
         var index = ${Index};
         var component = (${ComponentType})CreateComponent(index, typeof(${ComponentType}));
@@ -39,6 +47,18 @@ ${memberAssignmentList}
             @"public partial class ${EntityType} {
 
     static readonly ${ComponentType} ${componentName}Component = new ${ComponentType}();
+
+    public ${EntityType} Set${ComponentName}(bool value) {
+        ${prefixedComponentName} = value;
+    }
+
+    public ${EntityType} SetIs${ComponentName}() {
+        ${prefixedComponentName} = true;
+    }
+
+    public ${EntityType} SetIsNot${ComponentName}() {
+        ${prefixedComponentName} = false;
+    }
 
     public bool ${prefixedComponentName} {
         get { return HasComponent(${Index}); }

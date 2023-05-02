@@ -14,6 +14,7 @@ namespace Entitas.CodeGeneration.Plugins
     ${ComponentType} ${validComponentName} { get; }
     bool has${ComponentName} { get; }
 
+    ${EntityType} With${ComponentName}(${newMethodParameters});
     void Add${ComponentName}(${newMethodParameters});
     void Replace${ComponentName}(${newMethodParameters});
     void Remove${ComponentName}();
@@ -22,6 +23,11 @@ namespace Entitas.CodeGeneration.Plugins
 
         const string FLAG_TEMPLATE =
             @"public partial interface I${ComponentName}Entity {
+
+    ${EntityType} Set${ComponentName}(bool value);
+    ${EntityType} SetIs${ComponentName}();
+    ${EntityType} SetIsNot${ComponentName}();
+
     bool ${prefixedComponentName} { get; set; }
 }
 ";

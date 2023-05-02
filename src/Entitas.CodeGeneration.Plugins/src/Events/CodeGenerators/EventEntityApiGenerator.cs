@@ -11,6 +11,15 @@ namespace Entitas.CodeGeneration.Plugins
         const string TEMPLATE =
             @"public partial class ${EntityType} {
 
+    public ${EntityType} With${EventListener}(I${EventListener} value) {
+        var listeners = has${EventListener}
+            ? ${eventListener}.value
+            : new System.Collections.Generic.List<I${EventListener}>();
+        listeners.Add(value);
+        Replace${EventListener}(listeners);
+        return this;
+    }
+
     public void Add${EventListener}(I${EventListener} value) {
         var listeners = has${EventListener}
             ? ${eventListener}.value
