@@ -14,10 +14,9 @@ namespace Entitas.CodeGeneration.Plugins
     ${ComponentType} ${validComponentName} { get; }
     bool has${ComponentName} { get; }
 
-    TEntityType With${ComponentName}(${newMethodParameters});
-    void Add${ComponentName}(${newMethodParameters});
-    void Replace${ComponentName}(${newMethodParameters});
-    void Remove${ComponentName}();
+    TEntityType Add${ComponentName}(${newMethodParameters});
+    TEntityType Replace${ComponentName}(${newMethodParameters});
+    TEntityType Remove${ComponentName}();
 }
 ";
 

@@ -11,7 +11,7 @@ namespace Entitas.CodeGeneration.Plugins
         const string TEMPLATE =
             @"public partial class ${EntityType} {
 
-    public ${EntityType} With${EventListener}(I${EventListener} value) {
+    public ${EntityType} Add${EventListener}(I${EventListener} value) {
         var listeners = has${EventListener}
             ? ${eventListener}.value
             : new System.Collections.Generic.List<I${EventListener}>();
@@ -20,15 +20,7 @@ namespace Entitas.CodeGeneration.Plugins
         return this;
     }
 
-    public void Add${EventListener}(I${EventListener} value) {
-        var listeners = has${EventListener}
-            ? ${eventListener}.value
-            : new System.Collections.Generic.List<I${EventListener}>();
-        listeners.Add(value);
-        Replace${EventListener}(listeners);
-    }
-
-    public void Remove${EventListener}(I${EventListener} value, bool removeComponentWhenEmpty = true) {
+    public ${EntityType} Remove${EventListener}(I${EventListener} value, bool removeComponentWhenEmpty = true) {
         var listeners = ${eventListener}.value;
         listeners.Remove(value);
         if (removeComponentWhenEmpty && listeners.Count == 0) {
@@ -36,6 +28,7 @@ namespace Entitas.CodeGeneration.Plugins
         } else {
             Replace${EventListener}(listeners);
         }
+        return this;
     }
 }
 ";

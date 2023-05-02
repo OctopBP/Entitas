@@ -15,27 +15,25 @@ namespace Entitas.CodeGeneration.Plugins
     public ${ComponentType} ${validComponentName} { get { return (${ComponentType})GetComponent(${Index}); } }
     public bool has${ComponentName} { get { return HasComponent(${Index}); } }
 
-    public ${EntityType} With${ComponentName}(${newMethodParameters}) {
-        Add${ComponentName}(${newMethodArgs});
-        return this;
-    }
-
-    public void Add${ComponentName}(${newMethodParameters}) {
+    public ${EntityType} Add${ComponentName}(${newMethodParameters}) {
         var index = ${Index};
         var component = (${ComponentType})CreateComponent(index, typeof(${ComponentType}));
 ${memberAssignmentList}
         AddComponent(index, component);
+        return this;
     }
 
-    public void Replace${ComponentName}(${newMethodParameters}) {
+    public ${EntityType} Replace${ComponentName}(${newMethodParameters}) {
         var index = ${Index};
         var component = (${ComponentType})CreateComponent(index, typeof(${ComponentType}));
 ${memberAssignmentList}
         ReplaceComponent(index, component);
+        return this;
     }
 
-    public void Remove${ComponentName}() {
+    public ${EntityType} Remove${ComponentName}() {
         RemoveComponent(${Index});
+        return this;
     }
 }
 ";
