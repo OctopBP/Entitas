@@ -1,4 +1,5 @@
-﻿using Jenny;
+﻿using System;
+using Jenny;
 using DesperateDevs.Extensions;
 
 namespace Entitas.CodeGeneration.Plugins
@@ -13,7 +14,13 @@ namespace Entitas.CodeGeneration.Plugins
     public static class ComponentDataExtension
     {
         public static string ToComponentName(this string fullTypeName, bool ignoreNamespaces) => ignoreNamespaces
-            ? fullTypeName.ShortTypeName().RemoveComponentSuffix()
+            ? fullTypeName.MyTypeName().RemoveComponentSuffix()
             : fullTypeName.RemoveDots().RemoveComponentSuffix();
+        
+        public static string MyTypeName(this string fullTypeName)
+        {
+            int startIndex = fullTypeName.LastIndexOf(".", StringComparison.Ordinal) + 1;
+            return fullTypeName.Substring(startIndex, fullTypeName.Length - startIndex);
+        }
     }
 }
