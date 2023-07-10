@@ -43,7 +43,9 @@ namespace Entitas.CodeGeneration.Plugins
             .Replace("${methodParameters}", GetMethodParameters(data.GetMemberData(), false))
             .Replace("${newMethodArgs}", GetMethodArgs(data.GetMemberData(), true))
             .Replace("${methodArgs}", GetMethodArgs(data.GetMemberData(), false))
-            .Replace("${Index}", $"{contextName}{LOOKUP}.{data.ComponentName()}");
+            .Replace("${Index}", $"{contextName}{LOOKUP}.{data.ComponentName()}")
+            .Replace("${optionalValues}", GetOptionalValues(data.GetMemberData(), data.ComponentName()))
+            .Replace("${optionalValuesList}", GetOptionalValuesList(data.GetMemberData(), data.ComponentName()));
 
         public static string Replace(this string template, ComponentData data, string contextName, EventData eventData)
         {
@@ -110,5 +112,11 @@ namespace Entitas.CodeGeneration.Plugins
 
             return name;
         }
+        
+        public static string GetOptionalValues(this MemberData[] memberData, string componentName) => string.Join("\n", memberData
+            .Select(info => $"    LanguageExt.Option<{info.type}> maybe{componentName}_{info.name} {{ get; }}"));
+        
+        public static string GetOptionalValuesList(this MemberData[] memberData, string componentName) => string.Join("\n", memberData
+            .Select(info => $"public LanguageExt.Option<{info.type}> maybe{componentName}_{info.name} {{ get {{ return maybe{componentName}.Map(_ => _.{info.name}); }} }}"));
     }
 }

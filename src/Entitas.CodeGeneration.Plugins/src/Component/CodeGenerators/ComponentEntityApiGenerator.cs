@@ -12,6 +12,8 @@ namespace Entitas.CodeGeneration.Plugins
         const string STANDARD_TEMPLATE =
             @"public partial class ${EntityType} {
 
+    public LanguageExt.Option<${ComponentType}> maybe${ComponentName} { get { return HasComponent(${Index}) ? LanguageExt.Option<${ComponentType}>.Some((${ComponentType})GetComponent(${Index})) : LanguageExt.Option<${ComponentType}>.None; } }
+    ${optionalValuesList}
     public ${ComponentType} ${validComponentName} { get { return (${ComponentType})GetComponent(${Index}); } }
     public bool has${ComponentName} { get { return HasComponent(${Index}); } }
 
@@ -39,6 +41,11 @@ ${memberAssignmentList}
             @"public partial class ${EntityType} {
 
     static readonly ${ComponentType} ${componentName}Component = new ${ComponentType}();
+
+    public ${EntityType} Set${ComponentName}(bool value) {
+        ${prefixedComponentName} = value;
+        return this;
+    }
 
     public bool ${prefixedComponentName} {
         get { return HasComponent(${Index}); }

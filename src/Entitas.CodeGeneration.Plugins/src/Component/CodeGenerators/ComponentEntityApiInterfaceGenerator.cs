@@ -11,6 +11,8 @@ namespace Entitas.CodeGeneration.Plugins
         const string STANDARD_TEMPLATE =
             @"public partial interface I${ComponentName}Entity {
 
+    LanguageExt.Option<${ComponentType}> maybe${ComponentName} { get; }
+${optionalValues}
     ${ComponentType} ${validComponentName} { get; }
     bool has${ComponentName} { get; }
 
@@ -21,7 +23,10 @@ namespace Entitas.CodeGeneration.Plugins
 ";
 
         const string FLAG_TEMPLATE =
-            @"public partial interface I${ComponentName}Entity {
+            @"public partial interface I${ComponentName}Entity<TEntityType> where TEntityType : Entitas.Entity {
+
+    TEntityType Set${ComponentName}(bool value);
+
     bool ${prefixedComponentName} { get; set; }
 }
 ";
