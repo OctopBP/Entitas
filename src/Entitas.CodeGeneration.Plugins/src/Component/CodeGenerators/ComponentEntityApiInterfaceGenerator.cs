@@ -9,24 +9,31 @@ namespace Entitas.CodeGeneration.Plugins
         public override string Name => "Component (Entity API Interface)";
 
         const string STANDARD_TEMPLATE =
-            @"public partial interface I${ComponentName}Entity {
+            @"public partial interface I${ComponentName}Entity<TEntityType> where TEntityType : Entitas.Entity {
 
+    LanguageExt.Option<${ComponentType}> maybe${ComponentName} { get; }
+${optionalValues}
     ${ComponentType} ${validComponentName} { get; }
     bool has${ComponentName} { get; }
 
-    void Add${ComponentName}(${newMethodParameters});
-    void Replace${ComponentName}(${newMethodParameters});
-    void Remove${ComponentName}();
+    TEntityType Add${ComponentName}(${newMethodParameters});
+    TEntityType Replace${ComponentName}(${newMethodParameters});
+    TEntityType Remove${ComponentName}();
 }
 ";
 
         const string FLAG_TEMPLATE =
-            @"public partial interface I${ComponentName}Entity {
+            @"public partial interface I${ComponentName}Entity<TEntityType> where TEntityType : Entitas.Entity {
+
+    TEntityType Set${ComponentName}(bool value);
+    TEntityType SetIs${ComponentName}();
+    TEntityType SetIsNot${ComponentName}();
+
     bool ${prefixedComponentName} { get; set; }
 }
 ";
 
-        const string ENTITY_INTERFACE_TEMPLATE = "public partial class ${EntityType} : I${ComponentName}Entity { }\n";
+        const string ENTITY_INTERFACE_TEMPLATE = "public partial class ${EntityType} : I${ComponentName}Entity<${EntityType}> { }\n";
 
         public override CodeGenFile[] Generate(CodeGeneratorData[] data) => data
             .OfType<ComponentData>()

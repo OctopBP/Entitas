@@ -12,25 +12,30 @@ namespace Entitas.CodeGeneration.Plugins
         const string STANDARD_TEMPLATE =
             @"public partial class ${EntityType} {
 
+    public LanguageExt.Option<${ComponentType}> maybe${ComponentName} { get { return HasComponent(${Index}) ? LanguageExt.Option<${ComponentType}>.Some((${ComponentType})GetComponent(${Index})) : LanguageExt.Option<${ComponentType}>.None; } }
+    ${optionalValuesList}
     public ${ComponentType} ${validComponentName} { get { return (${ComponentType})GetComponent(${Index}); } }
     public bool has${ComponentName} { get { return HasComponent(${Index}); } }
 
-    public void Add${ComponentName}(${newMethodParameters}) {
+    public ${EntityType} Add${ComponentName}(${newMethodParameters}) {
         var index = ${Index};
         var component = (${ComponentType})CreateComponent(index, typeof(${ComponentType}));
 ${memberAssignmentList}
         AddComponent(index, component);
+        return this;
     }
 
-    public void Replace${ComponentName}(${newMethodParameters}) {
+    public ${EntityType} Replace${ComponentName}(${newMethodParameters}) {
         var index = ${Index};
         var component = (${ComponentType})CreateComponent(index, typeof(${ComponentType}));
 ${memberAssignmentList}
         ReplaceComponent(index, component);
+        return this;
     }
 
-    public void Remove${ComponentName}() {
+    public ${EntityType} Remove${ComponentName}() {
         RemoveComponent(${Index});
+        return this;
     }
 }
 ";
@@ -39,6 +44,21 @@ ${memberAssignmentList}
             @"public partial class ${EntityType} {
 
     static readonly ${ComponentType} ${componentName}Component = new ${ComponentType}();
+
+    public ${EntityType} Set${ComponentName}(bool value) {
+        ${prefixedComponentName} = value;
+        return this;
+    }
+
+    public ${EntityType} SetIs${ComponentName}() {
+        ${prefixedComponentName} = true;
+        return this;
+    }
+
+    public ${EntityType} SetIsNot${ComponentName}() {
+        ${prefixedComponentName} = false;
+        return this;
+    }
 
     public bool ${prefixedComponentName} {
         get { return HasComponent(${Index}); }
