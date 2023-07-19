@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Jenny;
 using Jenny.Plugins;
@@ -9,63 +10,62 @@ using Entitas.CodeGeneration.Attributes;
 using Entitas.CodeGeneration.Plugins;
 using Microsoft.CodeAnalysis;
 
-namespace Entitas.Roslyn.CodeGeneration.Plugins
+namespace Entitas.Roslyn.CodeGeneration.Plugins; 
+
+public class SystemsListDataProvider : IDataProvider, IConfigurable, ICachable
 {
-    public class SystemsListDataProvider : IDataProvider, IConfigurable, ICachable
+    public string Name => "SystemsList";
+    public int Order => 0;
+    public bool RunInDryMode => true;
+
+    public Dictionary<string, string> DefaultProperties => _projectPathConfig.DefaultProperties;
+
+    public Dictionary<string, object> ObjectCache { get; set; }
+
+    readonly ProjectPathConfig _projectPathConfig = new ProjectPathConfig();
+    readonly INamedTypeSymbol[] _types;
+
+    Preferences _preferences;
+    SystemsListDataProvider _systemsListDataProvider;
+
+    public SystemsListDataProvider() : this(null) { }
+
+    public SystemsListDataProvider(INamedTypeSymbol[] types)
     {
-        public string Name => "SystemsList";
-        public int Order => 0;
-        public bool RunInDryMode => true;
+        _types = types;
+    }
 
-        public Dictionary<string, string> DefaultProperties => _projectPathConfig.DefaultProperties;
+    public void Configure(Preferences preferences)
+    {
+        _preferences = preferences;
+        _projectPathConfig.Configure(preferences);
+    }
 
-        public Dictionary<string, object> ObjectCache { get; set; }
+    public CodeGeneratorData[] GetData()
+    {
+        var types = _types ?? Jenny.Plugins.Roslyn.PluginUtil
+            .GetCachedProjectParser(ObjectCache, _projectPathConfig.ProjectPath)
+            .GetTypes();
 
-        readonly ProjectPathConfig _projectPathConfig = new ProjectPathConfig();
-        readonly INamedTypeSymbol[] _types;
+        var componentInterface = typeof(IComponent).ToCompilableString();
 
-        Preferences _preferences;
-        ComponentDataProvider _componentDataProvider;
+        var systemsTypes = types
+            .Where(type => type.AllInterfaces.Any(i => i.ToCompilableString() == componentInterface))
+            .Where(type => !type.IsAbstract)
+            .Where(type => type.GetAttribute<SystemsListAttribute>() != null)
+            .ToArray();
 
-        public SystemsListDataProvider() : this(null) { }
+        var systemsTypesLookup = systemsTypes.ToDictionary(
+            type => type.ToCompilableString(),
+            type => (Type[])type.GetAttribute<SystemsListAttribute>().ConstructorArguments[0].Value);
 
-        public SystemsListDataProvider(INamedTypeSymbol[] types)
-        {
-            _types = types;
-        }
+        _systemsListDataProvider = new SystemsListDataProvider(systemsTypes);
+        _systemsListDataProvider.Configure(_preferences);
 
-        public void Configure(Preferences preferences)
-        {
-            _preferences = preferences;
-            _projectPathConfig.Configure(preferences);
-        }
-
-        public CodeGeneratorData[] GetData()
-        {
-            var types = _types ?? Jenny.Plugins.Roslyn.PluginUtil
-                .GetCachedProjectParser(ObjectCache, _projectPathConfig.ProjectPath)
-                .GetTypes();
-
-            var componentInterface = typeof(IComponent).ToCompilableString();
-
-            var cleanupTypes = types
-                .Where(type => type.AllInterfaces.Any(i => i.ToCompilableString() == componentInterface))
-                .Where(type => !type.IsAbstract)
-                .Where(type => type.GetAttribute<CleanupAttribute>() != null)
-                .ToArray();
-
-            var cleanupLookup = cleanupTypes.ToDictionary(
-                type => type.ToCompilableString(),
-                type => (CleanupMode)type.GetAttribute<CleanupAttribute>().ConstructorArguments[0].Value);
-
-            _componentDataProvider = new ComponentDataProvider(cleanupTypes);
-            _componentDataProvider.Configure(_preferences);
-
-            return _componentDataProvider
-                .GetData()
-                .Where(data => !((ComponentData)data).GetTypeName().RemoveComponentSuffix().HasListenerSuffix())
-                .Select(data => new CleanupData(data) {cleanupMode = cleanupLookup[((ComponentData)data).GetTypeName()]})
-                .ToArray();
-        }
+        return _systemsListDataProvider
+            .GetData()
+            .Where(data => !((ComponentData)data).GetTypeName().RemoveComponentSuffix().HasListenerSuffix())
+            .Select(data => new SystemsListData(data) { types = systemsTypesLookup[((ComponentData)data).GetTypeName()] })
+            .ToArray();
     }
 }

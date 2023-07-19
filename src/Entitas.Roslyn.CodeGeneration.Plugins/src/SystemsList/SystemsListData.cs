@@ -1,26 +1,17 @@
-﻿using Jenny;
-using Entitas.CodeGeneration.Attributes;
-using Entitas.CodeGeneration.Plugins;
+﻿using System;
+using Jenny;
 
-namespace Entitas.Roslyn.CodeGeneration.Plugins
+namespace Entitas.Roslyn.CodeGeneration.Plugins; 
+
+public class SystemsListData : CodeGeneratorData
 {
-    public class SystemsListData : CodeGeneratorData
+    public const string TYPES_LIST = "Types.List";
+
+    public Type[] types
     {
-        public const string CLEANUP_MODE = "Cleanup.Mode";
-
-        public CleanupMode cleanupMode
-        {
-            get => (CleanupMode)this[CLEANUP_MODE];
-            set => this[CLEANUP_MODE] = value;
-        }
-
-        public ComponentData componentData => _componentData;
-
-        readonly ComponentData _componentData;
-
-        public SystemsListData(CodeGeneratorData data) : base(data)
-        {
-            _componentData = (ComponentData)data;
-        }
+        get => (Type[])this[TYPES_LIST];
+        init => this[TYPES_LIST] = value;
     }
+    
+    public SystemsListData(CodeGeneratorData data) : base(data) { }
 }
